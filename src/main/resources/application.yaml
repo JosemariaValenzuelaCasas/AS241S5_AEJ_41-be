@@ -1,0 +1,35 @@
+server:
+  port: 8082
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://ep-steep-field-anhyza34-pooler.c-6.us-east-1.aws.neon.tech/josemaria_valenzuela_41?sslmode=require&channel_binding=require
+    username: neondb_owner
+    password: npg_J5lcgnALjof7
+  sql:
+    init:
+      mode: never 
+      schema-locations: classpath:schema.sql 
+      data-locations: classpath:data.sql 
+  logging:
+    level:
+      org.springframework.r2dbc: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+ai:
+  gemini:
+    api-key: <APIKEY>
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    model: gemini-2.5-flash
+
+  huggingface:
+    api-key: <APIKEY>
+    base-url: https://router.huggingface.co/hf-inference/models
+    model: facebook/bart-large-mnli
