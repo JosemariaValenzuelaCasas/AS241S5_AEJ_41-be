@@ -25,11 +25,11 @@ springdoc:
 
 ai:
   gemini:
-    api-key: <APIKEY>
+    api-key: AIzaSyAQBL_TI272xAmlGRjtPR0RzkswdrV0SrM
     base-url: https://generativelanguage.googleapis.com/v1beta
     model: gemini-2.5-flash
 
   huggingface:
-    api-key: <APIKEY>
+    api-key: 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
     base-url: https://router.huggingface.co/hf-inference/models
     model: facebook/bart-large-mnli
