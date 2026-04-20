@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: josemaria-valenzuela-41-container
-        image: juan321/age-detector-be:1.0   # Reemplaza con tu imagen Docker Hub
+        image: josemariavalenzuela/gemini/hugginface-be:1.0   # Reemplaza con tu imagen Docker Hub
         imagePullPolicy: IfNotPresent        # Evitar traer siempre la última versión si hay una actual
         envFrom:
         - secretRef:
