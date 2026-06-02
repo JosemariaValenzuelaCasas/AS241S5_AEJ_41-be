@@ -1,11 +1,11 @@
 server:
-  port: ${PORT}
+  port: 8082
 
 spring:
   r2dbc:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: r2dbc:postgresql://ep-steep-field-anhyza34-pooler.c-6.us-east-1.aws.neon.tech/josemaria_valenzuela_41?sslmode=require&channel_binding=require
+    username: neondb_owner
+    password: npg_J5lcgnALjof7
   sql:
     init:
       mode: never 
@@ -14,7 +14,6 @@ spring:
   logging:
     level:
       org.springframework.r2dbc: DEBUG
-      org.springframework.web.reactive.function.client: DEBUG
 
 springdoc:
   api-docs:
@@ -26,12 +25,12 @@ springdoc:
 
 ai:
   gemini:
-    api-key: ${GEMINI_APIKEY}
-    base-url: ${GEMINI_URL}
-    model: ${GEMINI_MODEL}
+    api-key: ${GEMINI_API_KEY}
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    model: gemini-2.5-flash
 
   huggingface:
-    api-key: ${HUGGINGFACE_APIKEY}
-    base-url: ${HUGGINGFACE_URL}
-    model: ${HUGGINGFACE_MODEL}
-    
+    api-key: ${HUGGINGFACE_TOKEN}
+    base-url: https://router.huggingface.co/hf-inference/models
+    model: facebook/bart-large-mnli
+    huggingface:

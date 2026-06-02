@@ -1,5 +1,4 @@
 package ap1.josemaria.valenzuela.model;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,9 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
 import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,4 +33,8 @@ public class GeminiQuery {
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
+
+    @Column("status")
+    @Builder.Default
+    private Boolean status = true;
 }

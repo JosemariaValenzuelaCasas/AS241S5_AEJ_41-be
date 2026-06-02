@@ -10,4 +10,6 @@ public interface HuggingFaceService {
     Mono<HuggingFaceQuery> classify(String inputText, String candidateLabels);
 
     Flux<HuggingFaceQuery> findAll();
+    Mono<HuggingFaceQuery> update(Long id, String newInputText, String newCandidateLabels);
+    Mono<HuggingFaceQuery> deleteLogical(Long id, boolean status);
 }

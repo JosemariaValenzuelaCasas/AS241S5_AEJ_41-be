@@ -88,4 +88,51 @@ public class GeminiServiceImpl implements GeminiService {
             return "Sin respuesta";
         }
     }
+
+    @Override
+    public Mono<GeminiQuery> update(Long id, String newPrompt) {
+        return repository.findById(id)
+            .flatMap(existingQuery -> {
+                log.info("[Gemini] Actualizando consulta id: {} con nuevo prompt: {}", id, newPrompt);
+                
+                Map<String, Object> requestBody = Map.of(
+                    "contents", List.of(Map.of("parts", List.of(Map.of("text", newPrompt))))
+                );
+
+                return geminiWebClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                        .path("/models/{model}:generateContent")
+                        .queryParam("key", apiKey)
+                        .build(model)
+                    )
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    // --- BLOQUE DE DEPURACIÓN ---
+                    .onStatus(status -> status.isError(), response -> 
+                        response.bodyToMono(String.class)
+                            .flatMap(errorBody -> {
+                                log.error("[Gemini API Error - UPDATE] Código: {}, Body: {}", response.statusCode(), errorBody);
+                                return Mono.error(new RuntimeException("Error en Gemini: " + errorBody));
+                            })
+                    )
+                    // ----------------------------
+                    .bodyToMono(Map.class)
+                    .map(this::extractText)
+                    .flatMap(newResponse -> {
+                        existingQuery.setPrompt(newPrompt);
+                        existingQuery.setResponse(newResponse);
+                        existingQuery.setCreatedAt(LocalDateTime.now());
+                        return repository.save(existingQuery);
+                    });
+            });
+    }
+
+    @Override
+    public Mono<GeminiQuery> deleteLogical(Long id, boolean status) {
+        return repository.findById(id)
+                .flatMap(query -> {
+                    query.setStatus(status);
+                    return repository.save(query);
+                });
+    }
 }

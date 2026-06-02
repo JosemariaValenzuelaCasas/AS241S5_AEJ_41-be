@@ -42,4 +42,8 @@ public class HuggingFaceQuery {
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;
+
+    @Column("status")
+    @Builder.Default
+    private Boolean status = true;
 }

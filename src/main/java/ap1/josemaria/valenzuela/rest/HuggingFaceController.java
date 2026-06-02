@@ -1,5 +1,6 @@
 package ap1.josemaria.valenzuela.rest;
 
+import ap1.josemaria.valenzuela.dto.HuggingFaceUpdateRequest;
 import ap1.josemaria.valenzuela.model.HuggingFaceQuery;
 import ap1.josemaria.valenzuela.service.HuggingFaceService;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/huggingface")
 @RequiredArgsConstructor
@@ -28,5 +29,22 @@ public class HuggingFaceController {
     @GetMapping("/history")
     public Flux<HuggingFaceQuery> history() {
         return huggingFaceService.findAll();
+    }
+
+    @PutMapping("/{id}")
+    public Mono<HuggingFaceQuery> update(
+            @PathVariable Long id, 
+            @RequestBody HuggingFaceUpdateRequest request) { 
+        
+        return huggingFaceService.update(
+                id, 
+                request.inputText(), 
+                request.candidateLabels()
+        ); 
+    }
+
+    @PatchMapping("/delete/{id}")
+    public Mono<HuggingFaceQuery> delete(@PathVariable Long id) { 
+        return huggingFaceService.deleteLogical(id, false); 
     }
 }

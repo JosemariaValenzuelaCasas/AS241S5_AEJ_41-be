@@ -86,6 +86,64 @@ public class HuggingFaceServiceImpl implements HuggingFaceService {
         return repository.findAllByOrderByCreatedAtDesc();
     }
 
+    @Override
+    public Mono<HuggingFaceQuery> update(Long id, String newInputText, String candidateLabels) {
+        return repository.findById(id)
+            .flatMap(existing -> {
+                log.info("[HuggingFace] Actualizando id: {} con texto: {}", id, newInputText);
+                
+                // 1. Preparamos los labels igual que en classify
+                List<String> labels = Arrays.stream(candidateLabels.split(","))
+                        .map(String::trim).toList();
+
+                HuggingFaceRequest request = new HuggingFaceRequest(
+                    newInputText, 
+                    new HuggingFaceRequest.Parameters(labels)
+                );
+
+                // 2. Usamos el WebClient limpio (sin header manual si ya funciona en classify)
+                return huggingFaceWebClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                        .pathSegment(model.split("/"))
+                        .build()
+                    )
+                    .bodyValue(request)
+                    .retrieve()
+                    // 3. ¡IMPORTANTE! Añade esto para ver el error real si vuelve a fallar
+                    .onStatus(status -> status.isError(), response ->
+                        response.bodyToMono(String.class)
+                            .flatMap(errorBody -> {
+                                log.error("[HuggingFace Update] Error API: {}", errorBody);
+                                return Mono.error(new RuntimeException("Error en IA: " + errorBody));
+                            })
+                    )
+                    .bodyToMono(List.class)
+                    .flatMap(list -> {
+                        Map<String, Object> body = (Map<String, Object>) list.get(0);
+                        
+                        // Actualizamos el objeto existente
+                        existing.setInputText(newInputText);
+                        existing.setCandidateLabels(candidateLabels);
+                        existing.setTopLabel(extractTopLabel(body));
+                        existing.setTopScore(extractTopScore(body));
+                        existing.setFullResponse(body.toString());
+                        existing.setCreatedAt(LocalDateTime.now());
+                        
+                        return repository.save(existing);
+                    });
+            })
+            // Si no encuentra el ID, lanzamos un error claro
+            .switchIfEmpty(Mono.error(new RuntimeException("No se encontró la consulta con ID: " + id)));
+    }
+
+    @Override
+    public Mono<HuggingFaceQuery> deleteLogical(Long id, boolean status) {
+        return repository.findById(id)
+                .flatMap(query -> {
+                    query.setStatus(status);
+                    return repository.save(query);
+                });
+    }
 
     @SuppressWarnings("unchecked")
     private String extractTopLabel(Map<?, ?> body) {

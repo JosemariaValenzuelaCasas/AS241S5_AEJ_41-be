@@ -9,4 +9,6 @@ public interface GeminiService {
     Mono<GeminiQuery> ask(String prompt);
 
     Flux<GeminiQuery> findAll();
+    Mono<GeminiQuery> update(Long id, String newPrompt);
+    Mono<GeminiQuery> deleteLogical(Long id, boolean status);
 }
